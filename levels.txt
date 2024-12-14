@@ -1,0 +1,2 @@
+Уровень 1, print("hello world")
+Уровень 2, print("hello world")\nfor i in range(10):\tprint(i)
