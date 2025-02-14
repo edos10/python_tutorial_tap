@@ -27,8 +27,13 @@ levels = [
     {"top_text": "Уровень 1", "center_text": ["Привет! Это первый уровень.", "       Кликай, чтобы увидеть текст."]},
     {"top_text": "Уровень 2", "center_text": ["Второй уровень.", "Здесь текст длиннее.", "Продолжай кликать!"]},
     {"top_text": "Уровень 3", "center_text": ["Третий уровень.", "Это последний уровень.", "Спасибо за игру!"]},
-    # Новый уровень
-    {"top_text": "Уровень 4", "center_text": ["name = input()", 'print(f"Hello, {name}!")']}  # Новый текст для нового уровня
+    {"top_text": "Уровень 4", "center_text": ["name = input()", 'print(f"Hello, {name}!")']},
+    {"top_text": "Уровень 5", "center_text": ["wow", 'hey']},
+    {"top_text": "Уровень 6", "center_text": ["wow", 'hey']},
+    {"top_text": "Уровень 7", "center_text": ["wow", 'hey']},
+    {"top_text": "Уровень 8", "center_text": ["wow", 'hey']},
+    {"top_text": "Уровень 9", "center_text": ["wow", 'hey']},
+    {"top_text": "Уровень 10", "center_text": ["wow", 'hey']}
 ]
 
 # Переменные
@@ -37,7 +42,7 @@ clicks = 0
 displayed_text = ""
 text_index = 0
 letter_index = 0
-
+level_offset = 0  # Для отслеживания текущего смещения уровня в списке
 
 # Функция для отрисовки текста
 def draw_text(text, x, y, color=LIGHT_GRAY):
@@ -45,12 +50,10 @@ def draw_text(text, x, y, color=LIGHT_GRAY):
     text_rect = text_surface.get_rect(center=(x, y))
     screen.blit(text_surface, text_rect)
 
-
 # Функция для отрисовки кнопки
 def draw_button(text, x, y, width, height, color):
     pygame.draw.rect(screen, color, (x, y, width, height), border_radius=10)
     draw_text(text, x + width // 2, y + height // 2, color=BLACK)  # Белый текст для контраста
-
 
 # Функция для отрисовки градиентного фона
 def draw_gradient_background():
@@ -63,16 +66,23 @@ def draw_gradient_background():
         )
         pygame.draw.line(screen, color, (0, i), (SCREEN_WIDTH, i))
 
-
 # Функция для отрисовки меню выбора уровня
 def draw_level_menu():
     draw_gradient_background()  # Градиентный фон
     draw_text("Выберите уровень", SCREEN_WIDTH // 2, 50, color=YELLOW)  # Желтый текст
-    for i, level in enumerate(levels):
-        draw_button(level["top_text"], SCREEN_WIDTH // 2 - 100, 150 + i * 100, 200, 50, DARK_YELLOW)
-    draw_button("Выход", SCREEN_WIDTH // 2 - 100, 150 + len(levels) * 100, 200, 50, DARK_YELLOW)
-    pygame.display.flip()
 
+    # Отображаем 5 уровней за раз
+    for i in range(level_offset, min(level_offset + 5, len(levels))):
+        draw_button(levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - level_offset) * 100, 200, 50, DARK_YELLOW)
+
+    # Кнопки для прокрутки
+    if level_offset > 0:
+        draw_button("←", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 100, 50, 50, DARK_YELLOW)  # Левая кнопка
+    if level_offset + 5 < len(levels):
+        draw_button("→", SCREEN_WIDTH // 2 + 150, SCREEN_HEIGHT - 100, 50, 50, DARK_YELLOW)  # Правая кнопка
+
+    draw_button("Выход", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, DARK_YELLOW)
+    pygame.display.flip()
 
 # Функция для отрисовки уровня
 def draw_level():
@@ -95,7 +105,6 @@ def draw_level():
     draw_text(f"Кликов: {clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=YELLOW)
     pygame.display.flip()
 
-
 # Основной цикл игры
 running = True
 in_menu = True
@@ -108,8 +117,8 @@ while running:
             mouse_pos = pygame.mouse.get_pos()
             if in_menu:
                 # Обработка кликов в меню
-                for i, level in enumerate(levels):
-                    button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, 150 + i * 100, 200, 50)
+                for i in range(level_offset, min(level_offset + 5, len(levels))):
+                    button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, 150 + (i - level_offset) * 100, 200, 50)
                     if button_rect.collidepoint(mouse_pos):
                         current_level = i
                         displayed_text = ""
@@ -117,9 +126,17 @@ while running:
                         text_index = 0
                         letter_index = 0
                 # Кнопка выхода
-                exit_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, 150 + len(levels) * 100, 200, 50)
+                exit_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50)
                 if exit_button_rect.collidepoint(mouse_pos):
                     running = False
+                # Кнопки прокрутки
+                left_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 100, 50, 50)
+                if left_button_rect.collidepoint(mouse_pos) and level_offset > 0:
+                    level_offset -= 5
+
+                right_button_rect = pygame.Rect(SCREEN_WIDTH // 2 + 150, SCREEN_HEIGHT - 100, 50, 50)
+                if right_button_rect.collidepoint(mouse_pos) and level_offset + 5 < len(levels):
+                    level_offset += 5
             else:
                 # Обработка кликов в уровне
                 click_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 100)
