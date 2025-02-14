@@ -13,6 +13,7 @@ pygame.display.set_caption("Python Kombat")
 # Цвета
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+DARK_BLUE = (0, 0, 139)
 YELLOW = (255, 223, 0)  # Ярко-желтый
 DARK_YELLOW = (204, 170, 0)  # Темный желтый
 DARK_RED = (139, 0, 0)  # Темно-красный для кнопок
@@ -38,6 +39,7 @@ levels = [
 
 # Переменные
 current_level = None
+current_theme = 1
 clicks = 0
 displayed_text = ""
 text_index = 0
@@ -51,58 +53,84 @@ def draw_text(text, x, y, color=LIGHT_GRAY):
     screen.blit(text_surface, text_rect)
 
 # Функция для отрисовки кнопки
-def draw_button(text, x, y, width, height, color):
-    pygame.draw.rect(screen, color, (x, y, width, height), border_radius=10)
-    draw_text(text, x + width // 2, y + height // 2, color=BLACK)  # Белый текст для контраста
+def draw_button(text, x, y, width, height, button_color, text_color):
+    pygame.draw.rect(screen, button_color, (x, y, width, height), border_radius=10)
+    draw_text(text, x + width // 2, y + height // 2, color=text_color)
 
 # Функция для отрисовки градиентного фона
-def draw_gradient_background():
+def draw_gradient_background(first_color, second_color):
     for i in range(SCREEN_HEIGHT):
         # Градиент от черного к темно-красному
         color = (
-            int(DARK_RED[0] * i / SCREEN_HEIGHT + BLACK[0] * (1 - i / SCREEN_HEIGHT)),
-            int(DARK_RED[1] * i / SCREEN_HEIGHT + BLACK[1] * (1 - i / SCREEN_HEIGHT)),
-            int(DARK_RED[2] * i / SCREEN_HEIGHT + BLACK[2] * (1 - i / SCREEN_HEIGHT)),
+            int(first_color[0] * i / SCREEN_HEIGHT + second_color[0] * (1 - i / SCREEN_HEIGHT)),
+            int(first_color[1] * i / SCREEN_HEIGHT + second_color[1] * (1 - i / SCREEN_HEIGHT)),
+            int(first_color[2] * i / SCREEN_HEIGHT + second_color[2] * (1 - i / SCREEN_HEIGHT)),
         )
         pygame.draw.line(screen, color, (0, i), (SCREEN_WIDTH, i))
 
 # Функция для отрисовки меню выбора уровня
 def draw_level_menu():
-    draw_gradient_background()  # Градиентный фон
-    draw_text("Выберите уровень", SCREEN_WIDTH // 2, 50, color=YELLOW)  # Желтый текст
+    first_color = DARK_RED
+    second_color = BLACK
+    button_color = DARK_YELLOW
+    text_color = BLACK
+    if current_theme == 1:
+        first_color = DARK_PURPLE
+        second_color = BLACK
+        button_color = DARK_BLUE
+        text_color = WHITE
+    draw_gradient_background(first_color, second_color)  # Градиентный фон
+    draw_text("Выберите уровень", SCREEN_WIDTH // 2, 50, color=WHITE)  # Желтый текст
 
     # Отображаем 5 уровней за раз
     for i in range(level_offset, min(level_offset + 5, len(levels))):
-        draw_button(levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - level_offset) * 100, 200, 50, DARK_YELLOW)
+        draw_button(levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - level_offset) * 100, 200, 50, button_color, text_color)
 
     # Кнопки для прокрутки
     if level_offset > 0:
-        draw_button("←", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 100, 50, 50, DARK_YELLOW)  # Левая кнопка
+        draw_button("←", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 100, 50, 50, button_color, text_color)  # Левая кнопка
     if level_offset + 5 < len(levels):
-        draw_button("→", SCREEN_WIDTH // 2 + 150, SCREEN_HEIGHT - 100, 50, 50, DARK_YELLOW)  # Правая кнопка
+        draw_button("→", SCREEN_WIDTH // 2 + 150, SCREEN_HEIGHT - 100, 50, 50, button_color, text_color)  # Правая кнопка
 
-    draw_button("Выход", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, DARK_YELLOW)
+    #  Смена темы
+    if current_theme == 1:
+        draw_button("X", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 560, 50, 50, DARK_PURPLE, text_color)
+        draw_button("", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 500, 50, 50, DARK_RED, text_color)
+    else:
+        draw_button("", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 560, 50, 50, DARK_PURPLE, text_color)
+        draw_button("X", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 500, 50, 50, DARK_RED, text_color)
+
+    draw_button("Выход", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, button_color, text_color)
     pygame.display.flip()
 
 # Функция для отрисовки уровня
 def draw_level():
-    draw_gradient_background()  # Градиентный фон
-    draw_text(levels[current_level]["top_text"], SCREEN_WIDTH // 2, 50, color=YELLOW)  # Желтый текст
+    first_color = DARK_RED
+    second_color = BLACK
+    button_color = DARK_YELLOW
+    text_color = WHITE
+    if current_theme == 1:
+        first_color = DARK_PURPLE
+        second_color = BLACK
+        button_color = DARK_BLUE
+        text_color = WHITE
+    draw_gradient_background(first_color, second_color)  # Градиентный фон
+    draw_text(levels[current_level]["top_text"], SCREEN_WIDTH // 2, 50, color=text_color)  # Желтый текст
 
     if text_index < len(levels[current_level]["center_text"]):
         for i in range(text_index + 1):
             current_text = levels[current_level]["center_text"][i]
             if i == text_index:
                 if letter_index < len(current_text):
-                    letter_surface = font.render(current_text[:letter_index], True, YELLOW)
+                    letter_surface = font.render(current_text[:letter_index], True, text_color)
                     screen.blit(letter_surface, (250, 100 + i * 40))
             else:
-                letter_surface = font.render(current_text, True, YELLOW)
+                letter_surface = font.render(current_text, True, text_color)
                 screen.blit(letter_surface, (250, 100 + i * 40))
 
-    draw_button("Клик!", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 100, YELLOW)
-    draw_button("Меню", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, YELLOW)
-    draw_text(f"Кликов: {clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=YELLOW)
+    draw_button("Клик!", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 100, button_color, text_color)
+    draw_button("Меню", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, button_color, text_color)
+    draw_text(f"Кликов: {clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=button_color)
     pygame.display.flip()
 
 # Основной цикл игры
@@ -137,6 +165,13 @@ while running:
                 right_button_rect = pygame.Rect(SCREEN_WIDTH // 2 + 150, SCREEN_HEIGHT - 100, 50, 50)
                 if right_button_rect.collidepoint(mouse_pos) and level_offset + 5 < len(levels):
                     level_offset += 5
+                # Кнопки смены темы
+                first_theme_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 500, 50, 50)
+                if first_theme_button_rect.collidepoint(mouse_pos):
+                    current_theme = 0
+                second_theme_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 560, 50, 50)
+                if second_theme_button_rect.collidepoint(mouse_pos):
+                    current_theme = 1
             else:
                 # Обработка кликов в уровне
                 click_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 100)
