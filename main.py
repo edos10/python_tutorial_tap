@@ -46,6 +46,17 @@ text_index = 0
 letter_index = 0
 level_offset = 0  # Для отслеживания текущего смещения уровня в списке
 
+def load_clicks():
+    global clicks
+    try:
+        f = open("clicks.txt", "r")
+        click_file = [int(i) for i in f.readlines()]
+        clicks = max(click_file)
+    except Exception:
+        pass
+
+load_clicks()
+
 # Функция для отрисовки текста
 def draw_text(text, x, y, color=LIGHT_GRAY):
     text_surface = font.render(text, True, color)
@@ -133,6 +144,17 @@ def draw_level():
     draw_text(f"Кликов: {clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=button_color)
     pygame.display.flip()
 
+
+def save_clicks(click: int):
+    with open("clicks.txt", "a+") as f:
+        f.write(f"{click}\n")
+
+
+def save_level(level: int):
+    with open("levels.txt", "a+") as f:
+        f.write(f"{level}\n")
+
+
 # Основной цикл игры
 running = True
 in_menu = True
@@ -178,12 +200,16 @@ while running:
                 menu_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50)
                 if click_button_rect.collidepoint(mouse_pos):
                     clicks += 1
+                    save_clicks(clicks)
                     if text_index < len(levels[current_level]["center_text"]):
+                        print(levels[current_level]["center_text"])
                         if letter_index < len(levels[current_level]["center_text"][text_index]) - 1:
                             letter_index += 1
                         else:
                             text_index += 1
                             letter_index = 0
+                    else:
+                        save_level(current_level+1)
 
                     if len(displayed_text) < len(levels[current_level]["center_text"]):
                         displayed_text += levels[current_level]["center_text"][len(displayed_text)]
@@ -198,4 +224,5 @@ while running:
 
 # Завершение работы
 pygame.quit()
+save_clicks(clicks)
 sys.exit()
