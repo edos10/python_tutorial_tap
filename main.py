@@ -19,6 +19,7 @@ DARK_YELLOW = (204, 170, 0)  # Темный желтый
 DARK_RED = (139, 0, 0)  # Темно-красный для кнопок
 DARK_PURPLE = (48, 25, 52)  # Темно-фиолетовый для градиента
 LIGHT_GRAY = (211, 211, 211)  # Светло-серый для текста
+GREEN = (0, 255, 0)
 
 # Шрифты
 font = pygame.font.SysFont('Arial', 30)
@@ -55,7 +56,25 @@ def load_clicks():
     except Exception:
         pass
 
+
+def load_levels():
+    try:
+        f = open("levels.txt", "r")
+        level_from_file = [int(j) for j in f.readlines()]
+        return level_from_file
+    except Exception:
+        return []
+
+levels_done = load_levels()
+
+
+def is_done_level(level: int):
+    global levels_done
+    return level + 1 in levels_done
+
+
 load_clicks()
+
 
 # Функция для отрисовки текста
 def draw_text(text, x, y, color=LIGHT_GRAY):
@@ -94,7 +113,12 @@ def draw_level_menu():
     draw_text("Выберите уровень", SCREEN_WIDTH // 2, 50, color=WHITE)  # Желтый текст
 
     # Отображаем 5 уровней за раз
+    prev_color_button = button_color
     for i in range(level_offset, min(level_offset + 5, len(levels))):
+        if is_done_level(i):
+            button_color = GREEN
+        else:
+            button_color = prev_color_button
         draw_button(levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - level_offset) * 100, 200, 50, button_color, text_color)
 
     # Кнопки для прокрутки
@@ -202,7 +226,6 @@ while running:
                     clicks += 1
                     save_clicks(clicks)
                     if text_index < len(levels[current_level]["center_text"]):
-                        print(levels[current_level]["center_text"])
                         if letter_index < len(levels[current_level]["center_text"][text_index]) - 1:
                             letter_index += 1
                         else:
