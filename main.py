@@ -175,6 +175,10 @@ def save_clicks(click: int):
 
 
 def save_level(level: int):
+    global levels_done
+
+    levels_done += [level]
+
     with open("levels.txt", "a+") as f:
         f.write(f"{level}\n")
 
