@@ -3,7 +3,11 @@ from internal.settings import *
 import json
 
 class Game:
-    def __init__(self, font=None):
+    def __init__(self, font=None,
+                 clicks_file="clicks.txt",
+                 levels_file="levels.txt",
+                 path_levels="./info/levels.json"
+                 ):
         self.current_level = None
         self.current_theme = 1
         self.clicks = 0
@@ -12,34 +16,37 @@ class Game:
         self.letter_index = 0
         self.level_offset = 0  # Для отслеживания текущего смещения уровня в списке
         self.levels = []
+        self.levels_done = []
+
         self.running = True
         self.in_menu = True
-        self.screen = screen
+
+        self.clicks_file = clicks_file
+        self.levels_file = levels_file
+        self.path_levels = path_levels
 
         self.font = font
+        self.screen = screen
 
         self.load_levels()
         self.load_clicks()
         self.load_completed_levels()
 
-    def load_levels(self, path_levels="./info/levels.json"):
-        print(open(path_levels, 'r', encoding='utf-8'))
-        with open(path_levels, 'r', encoding='utf-8') as file:
+    def load_levels(self):
+        with open(self.path_levels, 'r', encoding='utf-8') as file:
             self.levels = json.load(file)
-
 
     def load_clicks(self):
         try:
-            f = open("clicks.txt", "r")
+            f = open(self.clicks_file, "r")
             click_file = [int(i) for i in f.readlines()]
             self.clicks = max(click_file)
         except Exception:
             pass
 
-
     def load_completed_levels(self):
         try:
-            f = open("levels.txt", "r")
+            f = open(self.levels_file, "r")
             self.levels_done = [int(j) for j in f.readlines()]
         except Exception:
             return []
@@ -152,7 +159,6 @@ class Game:
 
         with open("levels.txt", "a+") as f:
             f.write(f"{level}\n")
-
 
     def run_game(self):
         pygame.init()

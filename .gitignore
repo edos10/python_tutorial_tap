@@ -2,3 +2,4 @@
 .idea
 clicks.txt
 levels.txt
+*/__pycache__
