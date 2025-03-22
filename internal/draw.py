@@ -97,7 +97,7 @@ class Game:
                 button_color = GREEN
             else:
                 button_color = prev_color_button
-            self.draw_button(self.levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - self.level_offset) * 100, 200, 50, button_color, text_color)
+            self.draw_button(self.levels[i]["top_text"], SCREEN_WIDTH // 2 - 100, 150 + (i - self.level_offset) * 100, 400, 50, button_color, text_color)
 
         # Кнопки для прокрутки
         if self.level_offset > 0:
