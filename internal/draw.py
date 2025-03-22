@@ -113,7 +113,7 @@ class Game:
             self.draw_button("", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 560, 50, 50, DARK_PURPLE, text_color)
             self.draw_button("X", SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 500, 50, 50, DARK_RED, text_color)
 
-        self.draw_button("Выход", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, button_color, text_color)
+        self.draw_button("Выход", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 100, 200, 50, button_color, text_color)
         pygame.display.flip()
 
     # Функция для отрисовки уровня
@@ -142,9 +142,9 @@ class Game:
                     letter_surface = self.font.render(current_text, True, text_color)
                     self.screen.blit(letter_surface, (250, 100 + i * 40))
 
-        self.draw_button("Клик!", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 100, button_color, text_color)
+        self.draw_button("Клик!", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 150, 200, 80, button_color, text_color)
         self.draw_button("Меню", SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50, button_color, text_color)
-        self.draw_text(f"Кликов: {self.clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=button_color)
+        self.draw_text(f"Кликов: {self.clicks}", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 200, color=text_color)
         pygame.display.flip()
 
 
@@ -180,9 +180,10 @@ class Game:
                                 self.text_index = 0
                                 self.letter_index = 0
                         # Кнопка выхода
-                        exit_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 50, 200, 50)
+                        exit_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT - 100, 200, 50)
                         if exit_button_rect.collidepoint(mouse_pos):
                             self.running = False
+                            break
                         # Кнопки прокрутки
                         left_button_rect = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT - 100, 50, 50)
                         if left_button_rect.collidepoint(mouse_pos) and self.level_offset > 0:
@@ -206,7 +207,7 @@ class Game:
                             self.clicks += 1
                             self.save_clicks()
                             if self.text_index < len(self.levels[self.current_level]["center_text"]):
-                                if self.letter_index < len(self.levels[self.current_level]["center_text"][self.text_index]) - 1:
+                                if self.letter_index < len(self.levels[self.current_level]["center_text"][self.text_index]):
                                     self.letter_index += 1
                                 else:
                                     self.text_index += 1
